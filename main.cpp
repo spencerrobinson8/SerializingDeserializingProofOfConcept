@@ -51,6 +51,17 @@ struct JsonFrame{
 
 struct JsonFrames{
     QVector<JsonFrame> frames;
+    QString serialize(){
+        QString jsonString;
+        foreach (JsonFrame frame, frames) {
+            int number = 0;
+            QString numberS = QString::number(number);
+            jsonString = "frame" + numberS;
+            jsonString.push_back(frame.serialize());
+            number++;
+        }
+        return jsonString;
+    }
 };
 
 void save(SimpleTimeline& t){
@@ -60,13 +71,14 @@ void save(SimpleTimeline& t){
     jTimeline["width"] = (int)t.getSizeX();
     jTimeline["numberOfFrames"] = (int)t.getFrames().size();
     //JsonPixel pixel;
-    JsonFrame frame;
+//    JsonFrame frame;
     //JsonRow row;
     JsonFrames frames;
     foreach(QPixmap* p, t.getFrames()) {
         QImage image = p->toImage();
         for(int x = 0; x < image.width(); x++) {
             JsonRow row;
+            JsonFrame frame;
 
             for(int y = 0; y < image.height(); y++){
                 JsonPixel pixel;
@@ -79,7 +91,7 @@ void save(SimpleTimeline& t){
             frame.rows.push_back(row);
             frames.frames.push_back(frame);
         }
-        jTimeline["frame_N"] = frame.serialize();
+        jTimeline["frames"] = frames.serialize();
     }
 
 
@@ -99,7 +111,7 @@ void load(){
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    SimpleTimeline* w = new SimpleTimeline(64, 64);
+    SimpleTimeline* w = new SimpleTimeline(4, 4);
     w->addFrame(QPixmap(":/img/me2"));
     w->addFrame(QPixmap(":/img/me.png"));
     save(*w);
