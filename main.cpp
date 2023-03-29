@@ -13,38 +13,44 @@
 
 struct JsonPixel{
     QVector<int> rgb;
-//    QString serialize(){
-//        QString json = "[";
-//        foreach(int i , rgb){
-//            json.push_back(i + ", ");
-//        }
-//        json.truncate(json.size()-2);
-//        json.push_back("]");
-//        return json;
-//    }
+    QString serialize(){
+        QString json = "[";
+        foreach(int i , rgb){
+            QString number = QString::number(i);
+            json.push_back(number + ", ");
+        }
+        json.truncate(json.size()-2);
+        json.push_back("]");
+        return json;
+    }
 
 };
 
 struct JsonRow{
     QVector<JsonPixel> pixels;
-//    QString serialize(){
-//        QString jsonString = "";
-//        foreach (JsonPixel pixel, pixels) {
-//            jsonString.push_back(pixel.serialize());
-//        }
-//        return jsonString;
-//    }
+    QString serialize(){
+        QString jsonString = "";
+        foreach (JsonPixel pixel, pixels) {
+            jsonString.push_back(pixel.serialize());
+        }
+        return jsonString;
+    }
 
 };
 
 struct JsonFrame{
     QVector<JsonRow> rows;
-//    QString serialize(){
-//        QString jsonString = "";
-//        foreach (JsonRow row, rows) {
-//            jsonString.push_back(row.serialize());
-//        }
-//        return jsonString;
+    QString serialize(){
+        QString jsonString = "";
+        foreach (JsonRow row, rows) {
+            jsonString.push_back(row.serialize());
+        }
+        return jsonString;
+    }
+};
+
+struct JsonFrames{
+    QVector<JsonFrame> frames;
 };
 
 void save(SimpleTimeline& t){
@@ -56,6 +62,7 @@ void save(SimpleTimeline& t){
     JsonPixel pixel;
     JsonFrame frame;
     JsonRow row;
+    JsonFrames frames;
     foreach(QPixmap* p, t.getFrames()) {
         QImage image = p->toImage();
         for(int x = 0; x < image.width(); x++) {
@@ -68,8 +75,9 @@ void save(SimpleTimeline& t){
                 row.pixels.push_back(pixel);
             }
             frame.rows.push_back(row);
+            frames.frames.push_back(frame);
         }
-        jTimeline["frame"] = "No";//frame.serialize();
+        jTimeline["frame_N"] = frame.serialize();
     }
 
 
