@@ -1,14 +1,4 @@
 #include "simpletimeline.h"
-#include "ui_simpletimeline.h"
-
-SimpleTimeline::SimpleTimeline(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::SimpleTimeline)
-{
-    ui->setupUi(this);
-}
-
-
 
 SimpleTimeline::SimpleTimeline(unsigned int sizeX, unsigned int sizeY, QWidget *parent)
     : QMainWindow(parent)
@@ -22,7 +12,6 @@ SimpleTimeline::SimpleTimeline(unsigned int sizeX, unsigned int sizeY, QWidget *
 }
 
 SimpleTimeline::~SimpleTimeline(){
-    delete ui;
     QPixmap* trash;
     while (!frames.empty()) {
         trash = frames.back();

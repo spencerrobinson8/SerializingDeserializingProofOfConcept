@@ -10,7 +10,42 @@
 #include <QDir>
 #include <QVector>
 #include <QDebug>
-#include "JsonStruct.cpp"
+
+struct JsonPixel{
+    QVector<int> rgb;
+//    QString serialize(){
+//        QString json = "[";
+//        foreach(int i , rgb){
+//            json.push_back(i + ", ");
+//        }
+//        json.truncate(json.size()-2);
+//        json.push_back("]");
+//        return json;
+//    }
+
+};
+
+struct JsonRow{
+    QVector<JsonPixel> pixels;
+//    QString serialize(){
+//        QString jsonString = "";
+//        foreach (JsonPixel pixel, pixels) {
+//            jsonString.push_back(pixel.serialize());
+//        }
+//        return jsonString;
+//    }
+
+};
+
+struct JsonFrame{
+    QVector<JsonRow> rows;
+//    QString serialize(){
+//        QString jsonString = "";
+//        foreach (JsonRow row, rows) {
+//            jsonString.push_back(row.serialize());
+//        }
+//        return jsonString;
+};
 
 void save(SimpleTimeline& t){
 
@@ -18,10 +53,6 @@ void save(SimpleTimeline& t){
     jTimeline["height"] =(int) t.getSizeY();
     jTimeline["width"] = (int)t.getSizeX();
     jTimeline["numberOfFrames"] = (int)t.getFrames().size();
-    QList<QRgb> list;
-    int n = 0;
-    QJsonArray arr2;
-    QJsonArray arr;
     JsonPixel pixel;
     JsonFrame frame;
     JsonRow row;
@@ -38,8 +69,7 @@ void save(SimpleTimeline& t){
             }
             frame.rows.push_back(row);
         }
-        jTimeline["frame" + n] = "frame.serialize()";
-        n++;
+        jTimeline["frame"] = "No";//frame.serialize();
     }
 
 
@@ -59,11 +89,11 @@ void load(){
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    SimpleTimeline w = new SimpleTimeline(64, 64);
-    w.addFrame(QPixmap(":/img/me2"));
-//    timeline->addFrame();
-    save(w);
+    SimpleTimeline* w = new SimpleTimeline(64, 64);
+    w->addFrame(QPixmap(":/img/me2"));
+    save(*w);
     load();
-    w.show();
+
+    w->show();
     return a.exec();
 }
