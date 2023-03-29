@@ -59,15 +59,17 @@ void save(SimpleTimeline& t){
     jTimeline["height"] =(int) t.getSizeY();
     jTimeline["width"] = (int)t.getSizeX();
     jTimeline["numberOfFrames"] = (int)t.getFrames().size();
-    JsonPixel pixel;
+    //JsonPixel pixel;
     JsonFrame frame;
-    JsonRow row;
+    //JsonRow row;
     JsonFrames frames;
     foreach(QPixmap* p, t.getFrames()) {
         QImage image = p->toImage();
         for(int x = 0; x < image.width(); x++) {
+            JsonRow row;
 
             for(int y = 0; y < image.height(); y++){
+                JsonPixel pixel;
                 pixel.rgb.push_back(image.pixelColor(x,y).red());
                 pixel.rgb.push_back(image.pixelColor(x,y).green());
                 pixel.rgb.push_back(image.pixelColor(x,y).blue());
@@ -99,6 +101,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     SimpleTimeline* w = new SimpleTimeline(64, 64);
     w->addFrame(QPixmap(":/img/me2"));
+    w->addFrame(QPixmap(":/img/me.png"));
     save(*w);
     load();
 
