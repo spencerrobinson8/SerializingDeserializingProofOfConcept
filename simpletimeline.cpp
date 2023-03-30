@@ -46,6 +46,12 @@ unsigned int SimpleTimeline::getSizeX(){
 unsigned int SimpleTimeline::getSizeY(){
     return size.height();
 }
+void SimpleTimeline::setSizeX(int x){
+    size.setWidth(x);
+}
+void SimpleTimeline::setSizeY(int y){
+    size.setHeight(y);
+}
 //bool simpleTimeline::getOnionSkinEnabled(){
 //    return onionSkinEnabled;
 //}

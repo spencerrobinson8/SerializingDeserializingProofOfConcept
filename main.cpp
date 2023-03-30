@@ -9,6 +9,8 @@
 #include <QDir>
 #include <QVector>
 #include <QDebug>
+#include <QApplication>
+#include <QByteArray>
 
 struct JsonPixel{
     QVector<int> rgb;
@@ -112,10 +114,22 @@ void save(SimpleTimeline& t){
     file.close();
 }
 
-void load(){
-
+SimpleTimeline* load(QString path){
+    QFile file(path);
+    QByteArray jsonData;
+    if(file.open(QFile::ReadOnly)){
+        jsonData = file.readAll();
+    }
+    else{
+        return nullptr;
+    }
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonData);
+    QJsonObject obj = jsonDocument.object();
+    QJsonValue x = obj.value("width");
+    QJsonValue y = obj.value("height");
+    SimpleTimeline st(x.toInt(),y.toInt());
 }
-#include <QApplication>
+
 
 int main(int argc, char *argv[])
 {
@@ -124,7 +138,8 @@ int main(int argc, char *argv[])
     w->addFrame(QPixmap(":/img/me2.png"));
     w->addFrame(QPixmap(":/img/me.png"));
     save(*w);
-    load();
+    QString path = QDir::currentPath() + "/JsonFile.ssp";
+    load(path);
 
     w->show();
     return a.exec();
