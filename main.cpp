@@ -78,9 +78,6 @@ void save(SimpleTimeline& t){
     jTimeline["height"] =(int) t.getSizeY();
     jTimeline["width"] = (int)t.getSizeX();
     jTimeline["numberOfFrames"] = (int)t.getFrames().size();
-    //JsonPixel pixel;
-//    JsonFrame frame;
-    //JsonRow row;
     JsonFrames frames;
     foreach(QPixmap* p, t.getFrames()) {
         QImage image = p->toImage();
@@ -127,7 +124,9 @@ SimpleTimeline* load(QString path){
     QJsonObject obj = jsonDocument.object();
     QJsonValue x = obj.value("width");
     QJsonValue y = obj.value("height");
-    SimpleTimeline st(x.toInt(),y.toInt());
+    SimpleTimeline* st = new SimpleTimeline(x.toInt(),y.toInt());
+    QJsonArray fames = obj.value("frames").toArray();
+    return st;
 }
 
 
@@ -137,9 +136,12 @@ int main(int argc, char *argv[])
     SimpleTimeline* w = new SimpleTimeline(4, 4);
     w->addFrame(QPixmap(":/img/me2.png"));
     w->addFrame(QPixmap(":/img/me.png"));
+    w->addFrame(QPixmap(":/img/me2.png"));
+    w->addFrame(QPixmap(":/img/me.png"));
     save(*w);
     QString path = QDir::currentPath() + "/JsonFile.ssp";
-    load(path);
+    SimpleTimeline* s = load(path);
+    delete s;
 
     w->show();
     return a.exec();
