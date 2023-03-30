@@ -45,6 +45,7 @@ struct JsonFrame{
         foreach (JsonRow row, rows) {
             jsonString.push_back(row.serialize());
         }
+//        jsonString.push_back(QString("\n"));
         return jsonString;
     }
 };
@@ -52,13 +53,14 @@ struct JsonFrame{
 struct JsonFrames{
     QVector<JsonFrame> frames;
     QString serialize(){
-        QString jsonString;
+        QString jsonString, frameString;
+        int number = 0;
         foreach (JsonFrame frame, frames) {
-            int number = 0;
             QString numberS = QString::number(number);
-            jsonString = "frame" + numberS;
-            jsonString.push_back(frame.serialize());
+            frameString = "frame" + numberS;
+            frameString.push_back(frame.serialize());
             number++;
+            jsonString.push_back(frameString);
         }
         return jsonString;
     }
@@ -76,11 +78,12 @@ void save(SimpleTimeline& t){
     JsonFrames frames;
     foreach(QPixmap* p, t.getFrames()) {
         QImage image = p->toImage();
-        for(int x = 0; x < image.width(); x++) {
+        JsonFrame frame;
+        for(int x = 0; x < (int) t.getSizeX(); x++) {
             JsonRow row;
-            JsonFrame frame;
 
-            for(int y = 0; y < image.height(); y++){
+
+            for(int y = 0; y < (int)t.getSizeY(); y++){
                 JsonPixel pixel;
                 pixel.rgb.push_back(image.pixelColor(x,y).red());
                 pixel.rgb.push_back(image.pixelColor(x,y).green());
@@ -89,10 +92,12 @@ void save(SimpleTimeline& t){
                 row.pixels.push_back(pixel);
             }
             frame.rows.push_back(row);
-            frames.frames.push_back(frame);
+
         }
-        jTimeline["frames"] = frames.serialize();
+        frames.frames.push_back(frame);
+
     }
+    jTimeline["frames"] = frames.serialize();
 
 
     QJsonDocument doc( jTimeline );
@@ -112,7 +117,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     SimpleTimeline* w = new SimpleTimeline(4, 4);
-    w->addFrame(QPixmap(":/img/me2"));
+    w->addFrame(QPixmap(":/img/me2.png"));
     w->addFrame(QPixmap(":/img/me.png"));
     save(*w);
     load();
