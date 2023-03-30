@@ -1,5 +1,4 @@
 #include "simpletimeline.h"
-#include <iostream>
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QJsonObject>
@@ -15,9 +14,11 @@ struct JsonPixel{
     QVector<int> rgb;
     QString serialize(){
         QString json = "[";
+        QJsonArray arr;
         foreach(int i , rgb){
             QString number = QString::number(i);
             json.push_back(number + ", ");
+            arr.push_back(i);
         }
         json.truncate(json.size()-2);
         json.push_back("]");
@@ -28,7 +29,7 @@ struct JsonPixel{
 
 struct JsonRow{
     QVector<JsonPixel> pixels;
-    QString serialize(){
+    QJsonValue serialize(){
         QString jsonString = "";
         foreach (JsonPixel pixel, pixels) {
             jsonString.push_back(pixel.serialize());
@@ -40,29 +41,32 @@ struct JsonRow{
 
 struct JsonFrame{
     QVector<JsonRow> rows;
-    QString serialize(){
-        QString jsonString = "";
+    QJsonArray serialize(){
+        QJsonArray jsonString;
         foreach (JsonRow row, rows) {
             jsonString.push_back(row.serialize());
         }
-//        jsonString.push_back(QString("\n"));
         return jsonString;
     }
 };
 
 struct JsonFrames{
     QVector<JsonFrame> frames;
-    QString serialize(){
-        QString jsonString, frameString;
+    QJsonObject serialize(){
+        QString frameString;
+
+        QJsonObject obj;
         int number = 0;
         foreach (JsonFrame frame, frames) {
+            QJsonArray arr;
             QString numberS = QString::number(number);
             frameString = "frame" + numberS;
-            frameString.push_back(frame.serialize());
             number++;
-            jsonString.push_back(frameString);
+            arr.push_back(frame.serialize());
+            obj[frameString] = arr;
         }
-        return jsonString;
+
+        return obj;
     }
 };
 
