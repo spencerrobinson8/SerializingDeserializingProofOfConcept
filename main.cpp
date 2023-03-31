@@ -125,7 +125,15 @@ SimpleTimeline* load(QString path){
     QJsonValue x = obj.value("width");
     QJsonValue y = obj.value("height");
     SimpleTimeline* st = new SimpleTimeline(x.toInt(),y.toInt());
-    QJsonArray fames = obj.value("frames").toArray();
+    QJsonValue frames = obj.value("frames");
+    QJsonObject frameObject = frames.toObject();
+    QJsonValue row = frameObject.value("frame0");
+    QJsonValue pixels = row[0];
+    QJsonValue pixelRow = pixels[0];
+    QString pixelRowString = pixelRow.toString();
+    QStringList rowsString =pixelRowString.split("[");
+    QStringList picelString = rowsString[1].split(",");
+    frames.toObject();
     return st;
 }
 
