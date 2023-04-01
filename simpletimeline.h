@@ -19,7 +19,7 @@ public:
       unsigned int getFrameDuration();
       unsigned int getSizeX();
       unsigned int getSizeY();
-      void addFrame(QPixmap s);
+      void addFrame(QPixmap* s);
       void setSizeX(int x);
       void setSizeY(int y);
 //    bool getOnionSkinEnabled();

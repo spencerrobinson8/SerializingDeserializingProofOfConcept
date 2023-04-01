@@ -22,9 +22,9 @@ SimpleTimeline::~SimpleTimeline(){
 
 }
 
-void SimpleTimeline::addFrame(QPixmap s) {
+void SimpleTimeline::addFrame(QPixmap* s) {
 
-    frames.push_back(&s);
+    frames.push_back(s);
 }
 
 QVector<QPixmap*> SimpleTimeline::getFrames(){

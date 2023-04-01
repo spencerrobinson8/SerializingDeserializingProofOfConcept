@@ -72,7 +72,7 @@ struct JsonFrames{
     }
 };
 
-void save(SimpleTimeline& t){
+void save(SimpleTimeline& t, QString path){
 
     QJsonObject jTimeline;
     jTimeline["height"] =(int) t.getSizeY();
@@ -84,8 +84,6 @@ void save(SimpleTimeline& t){
         JsonFrame frame;
         for(int x = 0; x < (int) t.getSizeX(); x++) {
             JsonRow row;
-
-
             for(int y = 0; y < (int)t.getSizeY(); y++){
                 JsonPixel pixel;
                 pixel.rgb.push_back(image.pixelColor(x,y).red());
@@ -95,7 +93,6 @@ void save(SimpleTimeline& t){
                 row.pixels.push_back(pixel);
             }
             frame.rows.push_back(row);
-
         }
         frames.frames.push_back(frame);
 
@@ -104,7 +101,7 @@ void save(SimpleTimeline& t){
 
 
     QJsonDocument doc( jTimeline );
-    QFile file("JsonFile.ssp");
+    QFile file(path);
     if(file.open(QFile::WriteOnly)){
         file.write(doc.toJson());
     }
@@ -124,16 +121,41 @@ SimpleTimeline* load(QString path){
     QJsonObject obj = jsonDocument.object();
     QJsonValue x = obj.value("width");
     QJsonValue y = obj.value("height");
+    QJsonValue numOfFrames = obj.value("numberOfFrames");
     SimpleTimeline* st = new SimpleTimeline(x.toInt(),y.toInt());
     QJsonValue frames = obj.value("frames");
     QJsonObject frameObject = frames.toObject();
-    QJsonValue row = frameObject.value("frame0");
-    QJsonValue pixels = row[0];
-    QJsonValue pixelRow = pixels[0];
-    QString pixelRowString = pixelRow.toString();
-    QStringList rowsString =pixelRowString.split("[");
-    QStringList picelString = rowsString[1].split(",");
-    frames.toObject();
+    QList<QImage> images;
+    for(int i = 0; i<numOfFrames.toInt(); i++){
+        QString framen = "frame" + QString::number(i);
+        QJsonValue row = frameObject.value(framen);
+        QImage image(x.toInt(), y.toInt(), QImage::Format_RGB32);
+        image.fill(QColor(0,0,0,0));
+        QJsonArray pixels = row[0].toArray();
+        for(int j = 0; j<y.toInt(); j++){
+            QJsonValue pixelRow = pixels[j];
+            QString pixelRowString = pixelRow.toString();
+            pixelRowString = pixelRowString.remove("]");
+            QStringList rowsString =pixelRowString.split("[", Qt::SkipEmptyParts);
+            for(int k = 0; k < x.toInt(); k++){
+
+                QStringList pixelString = rowsString[k].split(",");
+                int r, g, b, a;
+                r=pixelString[0].toInt();
+                g=pixelString[1].toInt();
+                b=pixelString[2].toInt();
+                a=pixelString[3].toInt();
+                image.setPixelColor(k,j, QColor(r,g,b,a));
+            }
+        }
+        images.push_back(image);
+
+    }
+    foreach(QImage img, images){
+        QPixmap* pixmap = new QPixmap(x.toInt(), y.toInt());
+        pixmap->convertFromImage(img);
+        st->addFrame(pixmap);
+    }
     return st;
 }
 
@@ -142,14 +164,19 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     SimpleTimeline* w = new SimpleTimeline(4, 4);
-    w->addFrame(QPixmap(":/img/me2.png"));
-    w->addFrame(QPixmap(":/img/me.png"));
-    w->addFrame(QPixmap(":/img/me2.png"));
-    w->addFrame(QPixmap(":/img/me.png"));
-    save(*w);
+    QPixmap* frameOne= new QPixmap(":/img/me2.png");
+    QPixmap* frameTwo = new QPixmap(":/img/me.png");
+    w->addFrame(frameOne);
+    w->addFrame(frameTwo);
+    w->addFrame(frameOne);
+    w->addFrame(frameTwo);
     QString path = QDir::currentPath() + "/JsonFile.ssp";
+    save(*w, path);
+
     SimpleTimeline* s = load(path);
-    delete s;
+    path = QDir::currentPath() + "/OtherJsonFile.ssp";
+    save(*s, path);
+
 
     w->show();
     return a.exec();
